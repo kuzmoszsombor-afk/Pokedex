@@ -7,15 +7,15 @@ import { toggleCatch } from '../features/pokemonSlice';
 
 interface PokemonCardProps {
   name: string;
+  type?: string;
   onClick: () => void;
 }
 
-export default function PokemonCard({ name, onClick }: PokemonCardProps) {
+export default function PokemonCard({ name, type, onClick }: PokemonCardProps) {
   const dispatch = useDispatch();
   const caughtPokemonNames = useSelector((state: RootState) => state.pokemon.caughtPokemonNames);
   const isCaught = caughtPokemonNames.includes(name);
 
-  // Esemény megállítása, hogy a gombnyomás ne aktiválja a kártya kattintást is
   const handleCatchClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     dispatch(toggleCatch(name));
@@ -24,28 +24,32 @@ export default function PokemonCard({ name, onClick }: PokemonCardProps) {
   return (
     <div 
       onClick={onClick}
-      className={`
-        flex items-center justify-between p-4 rounded-lg border-2 bg-white cursor-pointer transition-transform hover:scale-105
-        ${isCaught ? 'border-yellow-400' : 'border-blue-200'}
-      `}
+      className="flex items-center gap-6 py-2 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100"
     >
-      {/* Név (Nagybetűsítve) */}
-      <span className="font-bold text-gray-700 capitalize text-lg">
-        {name}
-      </span>
+      <div className="w-64">
+        <div className={`
+          border-2 rounded-2xl px-4 h-12 flex items-center capitalize bg-white transition-colors shadow-sm font-medium
+          ${isCaught ? 'border-yellow-400 text-gray-500' : 'border-blue-200 text-gray-700'}
+        `}>
+          {name}
+        </div>
+      </div>
 
-      {/* Státusz és Gomb */}
-      <div className="flex items-center gap-3">
-        {isCaught && (
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-            Caught
-          </span>
-        )}
-        
+      <div className="w-40">
+        <div className="border-2 border-blue-200 rounded-2xl px-4 h-12 flex items-center justify-center text-gray-600 capitalize bg-white text-sm shadow-sm font-medium">
+          {type || '-'}
+        </div>
+      </div>
+
+      <div className="w-24 text-center font-bold text-gray-400 text-xs uppercase tracking-wider">
+        {isCaught ? 'Caught' : '-'}
+      </div>
+
+      <div className="w-32 flex justify-end">
         <button
           onClick={handleCatchClick}
           className={`
-            px-4 py-1 rounded text-white font-bold text-sm shadow-md transition-colors
+            w-full h-12 rounded-2xl text-white font-bold text-sm shadow-md transition-all flex items-center justify-center
             ${isCaught 
               ? 'bg-yellow-400 hover:bg-yellow-500 text-yellow-900' 
               : 'bg-blue-600 hover:bg-blue-700'}
