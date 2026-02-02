@@ -1,32 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../lib/store';
-import { toggleCatch } from '../features/pokemonSlice';
-import { getPokemonDetails } from '../services/pokemonApi';
-
-interface Ability {
-  ability: {
-    name: string;
-  };
-  is_hidden: boolean;
-}
-
-interface PokemonData {
-  name: string;
-  weight: number;
-  height: number;
-  sprites: {
-    front_default: string;
-    other: {
-      'official-artwork': {
-        front_default: string;
-      };
-    };
-  };
-  abilities: Ability[];
-}
+import React from 'react';
+import { usePokemonDetails } from '../hooks/usePokemonDetails';
 
 interface PokemonDetailsProps {
   pokemonName: string;
@@ -34,13 +9,8 @@ interface PokemonDetailsProps {
 }
 
 export default function PokemonDetails({ pokemonName, onBack }: PokemonDetailsProps) {
-  const [details, setDetails] = useState<PokemonData | null>(null);
-  const dispatch = useDispatch();
-  const caughtPokemonNames = useSelector((state: RootState) => state.pokemon.caughtPokemonNames);
-
-  useEffect(() => {
-    getPokemonDetails(pokemonName).then((data) => setDetails(data));
-  }, [pokemonName]);
+  // Logika behúzása
+  const { details, isCaught, toggleStatus } = usePokemonDetails(pokemonName);
 
   if (!details) {
     return (
@@ -50,11 +20,8 @@ export default function PokemonDetails({ pokemonName, onBack }: PokemonDetailsPr
     );
   }
 
-  const isCaught = caughtPokemonNames.includes(pokemonName);
-
   return (
     <div className="min-h-screen bg-white font-sans">
-      
       <header className="bg-red-600 p-4 shadow-md flex items-center justify-center relative">
          <h1 className="text-yellow-400 text-3xl font-bold tracking-wider drop-shadow-md">
             PokéDex
@@ -65,7 +32,6 @@ export default function PokemonDetails({ pokemonName, onBack }: PokemonDetailsPr
       </header>
 
       <div className="max-w-4xl mx-auto p-6">
-        
         <button 
           onClick={onBack}
           className="flex items-center text-gray-500 hover:text-gray-800 transition-colors mb-6 font-bold"
@@ -77,7 +43,6 @@ export default function PokemonDetails({ pokemonName, onBack }: PokemonDetailsPr
         </button>
 
         <div className="flex flex-col md:flex-row gap-8 items-start">
-          
           <div className="w-full md:w-1/2">
              <div className="border-4 border-yellow-400 rounded-lg p-8 flex justify-center items-center bg-blue-50">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -90,24 +55,19 @@ export default function PokemonDetails({ pokemonName, onBack }: PokemonDetailsPr
           </div>
 
           <div className="w-full md:w-1/2 space-y-6">
-            
             <div className="rounded-lg overflow-hidden border border-gray-200">
-              
               <div className="flex text-sm">
                 <div className="w-1/3 bg-slate-300 p-3 font-bold text-gray-700 flex items-center">Name</div>
                 <div className="w-2/3 bg-slate-200 p-3 font-bold text-gray-900 capitalize">{details.name}</div>
               </div>
-
               <div className="flex text-sm">
                 <div className="w-1/3 bg-yellow-200 p-3 font-bold text-gray-700 flex items-center">Weight</div>
                 <div className="w-2/3 bg-yellow-100 p-3 font-bold text-gray-900">{details.weight}</div>
               </div>
-
               <div className="flex text-sm">
                 <div className="w-1/3 bg-slate-300 p-3 font-bold text-gray-700 flex items-center">Height</div>
                 <div className="w-2/3 bg-slate-200 p-3 font-bold text-gray-900">{details.height}</div>
               </div>
-
               <div className="flex text-sm">
                 <div className="w-1/3 bg-yellow-200 p-3 font-bold text-gray-700 flex items-center">Abilities</div>
                 <div className="w-2/3 bg-yellow-100 p-3 font-bold text-gray-900">
@@ -122,18 +82,16 @@ export default function PokemonDetails({ pokemonName, onBack }: PokemonDetailsPr
                   </ul>
                 </div>
               </div>
-
               <div className="flex text-sm">
                 <div className="w-1/3 bg-slate-300 p-3 font-bold text-gray-700 flex items-center">Status</div>
                 <div className="w-2/3 bg-slate-200 p-3 font-bold text-gray-900">
                    {isCaught ? 'Caught' : '-'}
                 </div>
               </div>
-
             </div>
 
             <button
-              onClick={() => dispatch(toggleCatch(pokemonName))}
+              onClick={toggleStatus}
               className={`
                 w-full py-3 rounded font-bold text-lg shadow-md transition-colors
                 ${isCaught 
@@ -143,10 +101,8 @@ export default function PokemonDetails({ pokemonName, onBack }: PokemonDetailsPr
             >
               {isCaught ? 'Release' : 'Catch'}
             </button>
-
           </div>
         </div>
-
       </div>
     </div>
   );

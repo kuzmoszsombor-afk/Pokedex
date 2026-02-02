@@ -1,9 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../lib/store';
-import { toggleCatch } from '../features/pokemonSlice';
+import { usePokemonCard } from '../hooks/usePokemonCard';
 
 interface PokemonCardProps {
   name: string;
@@ -12,14 +10,8 @@ interface PokemonCardProps {
 }
 
 export default function PokemonCard({ name, type, onClick }: PokemonCardProps) {
-  const dispatch = useDispatch();
-  const caughtPokemonNames = useSelector((state: RootState) => state.pokemon.caughtPokemonNames);
-  const isCaught = caughtPokemonNames.includes(name);
-
-  const handleCatchClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    dispatch(toggleCatch(name));
-  };
+  // Itt hívjuk meg a logikát, a kód többi része tiszta UI marad
+  const { isCaught, handleCatchClick } = usePokemonCard(name);
 
   return (
     <div 

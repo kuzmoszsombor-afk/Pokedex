@@ -1,74 +1,28 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../lib/store';
-import { getTypes, getPokemonsByType } from '../services/pokemonApi';
+import React from 'react';
 import PokemonCard from '../components/PokemonCard';
 import PokemonDetails from '../components/PokemonDetails';
-
-interface Pokemon {
-  name: string;
-  url: string;
-}
-
-interface Type {
-  name: string;
-  url: string;
-}
-
-interface TypeApiResponse {
-  results: Type[];
-}
-
-interface PokemonListResponse {
-  pokemon: Array<{ pokemon: Pokemon }>;
-}
+import { useHome } from '../hooks/useHome';
 
 export default function Home() {
-  const [types, setTypes] = useState<Type[]>([]);
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [loading, setLoading] = useState(false);
-  
-  const [selectedType, setSelectedType] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showOnlyCaught, setShowOnlyCaught] = useState(false);
-  
-  const [selectedPokemonName, setSelectedPokemonName] = useState<string | null>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const caughtPokemonNames = useSelector((state: RootState) => state.pokemon.caughtPokemonNames);
-
-  useEffect(() => {
-    getTypes().then((data: TypeApiResponse) => setTypes(data.results));
-  }, []);
-
-  const handleTypeChange = async (url: string) => {
-    setSelectedType(url);
-    if (!url) {
-      setPokemons([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const data: PokemonListResponse = await getPokemonsByType(url);
-      setPokemons(data.pokemon.map((p) => p.pokemon));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredPokemons = useMemo(() => {
-    return pokemons.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCaught = showOnlyCaught ? caughtPokemonNames.includes(p.name) : true;
-      return matchesSearch && matchesCaught;
-    });
-  }, [pokemons, searchTerm, showOnlyCaught, caughtPokemonNames]);
-
-  const currentTypeName = types.find(t => t.url === selectedType)?.name;
+  // Egyetlen sorban behúzzuk az egész "agyat"
+  const {
+    types,
+    loading,
+    selectedType,
+    // searchTerm, // nem használjuk közvetlenül, csak a settert
+    setSearchTerm,
+    // showOnlyCaught, // nem használjuk közvetlenül, csak a settert
+    setShowOnlyCaught,
+    selectedPokemonName,
+    setSelectedPokemonName,
+    isMobileMenuOpen,
+    setIsMobileMenuOpen,
+    handleTypeChange,
+    filteredPokemons,
+    currentTypeName
+  } = useHome();
 
   if (selectedPokemonName) {
     return (
